@@ -19,7 +19,7 @@ echo "[*] Копируем скрипт запуска в $START_SCRIPT"
 cat > "$START_SCRIPT" <<EOF
 #!/bin/bash
 cd "$PROJECT_DIR" || exit 1
-./$RUN_SCRIPT
+sudo bash ./$RUN_SCRIPT
 EOF
 
 chmod +x "$START_SCRIPT"
