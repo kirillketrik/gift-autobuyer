@@ -44,3 +44,12 @@ if [ -f "$SERVICE_PATH" ]; then
 else
     echo "[*] Сервис не найден."
 fi
+
+
+echo "[*] Проверка и удаление Docker volume \"telegram-gift-autobuyer\"..."
+if docker volume ls --format '{{.Name}}' | grep -q "^telegram-gift-autobuyer$"; then
+    docker volume rm telegram-gift-autobuyer
+    echo "[*] Том telegram-gift-autobuyer удалён."
+else
+    echo "[*] Том telegram-gift-autobuyer не найден."
+fi
