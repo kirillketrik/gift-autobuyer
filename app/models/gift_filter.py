@@ -16,6 +16,7 @@ class GiftFilter(BaseModel):
     weight: Annotated[int, Field(default=-1, description="Часть бюджета для подарков. -1 = выключено")]
     max_buy_count: Annotated[int, Field(default=-1, description="Максимальное кол-во покупок. -1 = без лимита")]
     max_spend_money: Annotated[int, Field(default=-1, description="Максимально можно потратить. -1 = без лимита")]
+    ordering: Annotated[str, Field(default='-price', description="Сортировка отфильтрованных результатов. Сортировка может быть по полям price и supply в убывающем или возрастающем порядке.")]
 
     class Config:
         from_attributes = True

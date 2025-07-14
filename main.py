@@ -1,8 +1,6 @@
 import asyncio
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from telethon import TelegramClient
-from telethon.sessions import StringSession
 
 from app.autobuyer import start_autobuy, auth
 from app.bot import start_bot
