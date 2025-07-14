@@ -20,10 +20,12 @@ class DefaultGiftAllocator(GiftAllocator):
         allocations = []
 
         for gift_filter in self.gift_filters:
+            order, field = gift_filter.ordering[0], gift_filter.ordering[1:]
+
             valid_gifts = sorted(
                 [g for g in gifts if gift_filter.match(g)],
-                key=lambda g: g.price,
-                reverse=True
+                key=lambda g: getattr(g, field, 0),
+                reverse=order
             )
 
             if len(valid_gifts) == 0:
