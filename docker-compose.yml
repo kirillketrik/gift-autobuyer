@@ -10,11 +10,11 @@ services:
     env_file:
       - .env
     volumes:
-      - app_data:/app
+      - telegram-gift-autobuyer:/app
     restart: unless-stopped
     command: python main.py
     stdin_open: true
     tty: true
 
 volumes:
-  app_data:
+  telegram-gift-autobuyer:
