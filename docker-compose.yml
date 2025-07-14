@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: telegram-gift-autobuyer
     env_file:
-      - .env-dist
+      - .env-template
     volumes:
       - app_data:/app
     restart: unless-stopped
