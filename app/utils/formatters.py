@@ -37,6 +37,7 @@ def format_filter(data: GiftFilter, index: int = 0) -> str:
     fields['Доля бюджета'] = data.weight
     fields['Макс. кол-во'] = data.max_buy_count
     fields['Макс. бюджет'] = data.max_spend_money
+    fields['Сортировка'] = data.ordering
 
     for label, value in fields.items():
         if isinstance(value, int) and value == -1:

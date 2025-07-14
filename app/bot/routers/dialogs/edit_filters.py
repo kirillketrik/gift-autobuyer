@@ -13,7 +13,7 @@ from tortoise.transactions import in_transaction
 from app.database.models import GiftFilterModel  # Импорт модели
 
 
-async def on_save_filters(callback, button, manager: DialogManager):
+async def on_save_filters(_, __, manager: DialogManager):
     filters = manager.dialog_data.get("filters", [])
     async with in_transaction():
         for data in filters:
@@ -22,7 +22,7 @@ async def on_save_filters(callback, button, manager: DialogManager):
     await manager.done()
 
 
-async def get_paginated_filters(dialog_manager, **kwargs):
+async def get_paginated_filters(dialog_manager: DialogManager, **kwargs):
     filters = dialog_manager.dialog_data.get("filters", [])
     pages = dialog_manager.dialog_data.get("filter_pages")
     page_index = dialog_manager.dialog_data.get("filter_page_index", 0)
@@ -45,16 +45,15 @@ async def get_paginated_filters(dialog_manager, **kwargs):
     }
 
 
-async def on_prev_page(c, b, m: DialogManager):
-    m.dialog_data["filter_page_index"] = max(0, m.dialog_data.get("filter_page_index", 0) - 1)
+async def on_prev_page(_, __, manager: DialogManager):
+    manager.dialog_data["filter_page_index"] = max(0, manager.dialog_data.get("filter_page_index", 0) - 1)
 
 
-async def on_next_page(c, b, m: DialogManager):
-    pages = m.dialog_data.get("filter_pages", [])
-    m.dialog_data["filter_page_index"] = min(len(pages) - 1, m.dialog_data.get("filter_page_index", 0) + 1)
+async def on_next_page(_, __, manager: DialogManager):
+    pages = manager.dialog_data.get("filter_pages", [])
+    manager.dialog_data["filter_page_index"] = min(len(pages) - 1, manager.dialog_data.get("filter_page_index", 0) + 1)
 
 
-# Состояние выбора режима
 async def on_select_mode(callback: types.CallbackQuery, _, manager: DialogManager):
     mode = callback.data
     if mode == "ai":
@@ -95,7 +94,6 @@ async def on_manual_input(message, _, manager: DialogManager):
 
 # Диалог
 dialog = Dialog(
-    # 1️⃣ Выбор режима
     Window(
         Const("<b>💡 Выберите способ создания фильтров:</b>"),
         Row(
@@ -105,8 +103,6 @@ dialog = Dialog(
         Cancel(Const("❌ Отмена")),
         state=EditGiftFilterSG.select_mode,
     ),
-
-    # 2️⃣ Ввод промта для ИИ
     Window(
         Const(
             "<b>🧠 Введите текст, описывающий ваши пожелания к фильтрам.</b>\n\n"
