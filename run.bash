@@ -35,7 +35,7 @@ if ! sudo systemctl is-active --quiet docker; then
 fi
 
 # Определяем, какую команду использовать для Docker Compose
-if command -v docker compose &> /dev/null; then
+if docker compose version &> /dev/null; then
     echo "[*] Using 'docker compose' plugin"
     echo "[*] Building and starting container in background..."
     docker compose up --build -d
