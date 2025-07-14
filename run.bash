@@ -34,20 +34,21 @@ if ! sudo systemctl is-active --quiet docker; then
     sudo systemctl start docker
 fi
 
-echo "[*] Checking docker-compose plugin..."
+# Определяем, какую команду использовать для Docker Compose
 if command -v docker compose &> /dev/null; then
-    COMPOSE_CMD="docker compose"
+    echo "[*] Using 'docker compose' plugin"
+    echo "[*] Building and starting container in background..."
+    docker compose up --build -d
 elif command -v docker-compose &> /dev/null; then
-    COMPOSE_CMD="docker-compose"
+    echo "[*] Using classic 'docker-compose' binary"
+    echo "[*] Building images..."
+    docker-compose build
+    echo "[*] Starting container in background..."
+    docker-compose up -d
 else
     echo "[!] Neither 'docker compose' nor 'docker-compose' found. Please install Docker Compose."
     exit 1
 fi
-
-echo "[*] Using: $COMPOSE_CMD"
-echo "[*] Building and starting container in background..."
-$COMPOSE_CMD up --build -d
-
 
 echo "[*] Waiting for container \"$CONTAINER_NAME\" to start..."
 for i in {1..30}; do
