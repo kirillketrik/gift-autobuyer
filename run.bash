@@ -35,13 +35,19 @@ if ! sudo systemctl is-active --quiet docker; then
 fi
 
 echo "[*] Checking docker-compose plugin..."
-if ! docker compose version &> /dev/null; then
-    echo "[!] docker compose plugin not available. Please ensure Docker version >= 20.10 and plugin installed."
+if command -v docker compose &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+else
+    echo "[!] Neither 'docker compose' nor 'docker-compose' found. Please install Docker Compose."
     exit 1
 fi
 
+echo "[*] Using: $COMPOSE_CMD"
 echo "[*] Building and starting container in background..."
-docker compose up --build -d
+$COMPOSE_CMD up --build -d
+
 
 echo "[*] Waiting for container \"$CONTAINER_NAME\" to start..."
 for i in {1..30}; do
