@@ -28,7 +28,7 @@ async def on_save_filters(
     await manager.done()
 
 
-async def get_paginated_filters(dialog_manager: DialogManager, **kwargs):
+async def get_paginated_filters(dialog_manager: DialogManager, **_kwargs):
     filters = dialog_manager.dialog_data.get("filters", [])
     pages = dialog_manager.dialog_data.get("filter_pages")
     page_index = dialog_manager.dialog_data.get("filter_page_index", 0)

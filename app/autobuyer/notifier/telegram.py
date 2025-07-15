@@ -19,5 +19,5 @@ class TelegramNotifier(Notifier):
                     parse_mode=ParseMode.HTML,
                     text=message
                 )
-            except Exception as e:
+            except Exception:
                 pass
