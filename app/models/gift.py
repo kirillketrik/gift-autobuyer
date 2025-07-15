@@ -1,5 +1,7 @@
-from pydantic import BaseModel, conint, Field
 from typing import Annotated
+
+from pydantic import BaseModel, Field
+
 
 class Gift(BaseModel):
     id: int
