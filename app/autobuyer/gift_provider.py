@@ -13,7 +13,6 @@ from telethon.tl.types.payments import PaymentFormStarGift
 from telethon.tl.types.payments import StarGifts
 
 from app.autobuyer.exceptions import OldGiftsReceivedError, GiftSoldOutError, AutobuyerError
-from app.exceptions import UnknownGiftsError
 from app.models import Gift
 
 
