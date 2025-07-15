@@ -15,10 +15,17 @@ class ReceiverReader(ABC):
 
 class ReceiverWriter(ABC):
     @abstractmethod
-    async def write_all(self, receivers: List[Receiver]) -> None:
+    async def save(self, receiver: Receiver) -> None:
         """
-        Заменяет старых получаетелей на новых
-        :param receivers: Список новых получателей
+        Сохраняет получателя подарков
+        :param receiver: Получатель подарка
+        """
+
+    @abstractmethod
+    async def delete(self, receiver_ids: List[int]) -> None:
+        """
+        Удаляет получателей с указанными id
+        :param receiver_ids: ID получателей для удаления
         """
 
 
