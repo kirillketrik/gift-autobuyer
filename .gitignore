@@ -163,4 +163,4 @@ cython_debug/
 .idea/
 
 storage/*.db*
-storage/*.session
+storage/*.session*
