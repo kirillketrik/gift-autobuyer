@@ -3,10 +3,10 @@ from aiogram_dialog import Dialog, Window
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, Cancel, Row
-from aiogram_dialog.widgets.text import Const, Format, Jinja
+from aiogram_dialog.widgets.text import Const, Format
 
 from app.bot.states import DeleteFilterSG
-from app.database.models import GiftFilterModel
+from app.core.interfaces.repository import GiftFilterRepository
 
 
 async def on_input_ids(msg: types.Message, _, manager: DialogManager):
@@ -21,9 +21,13 @@ async def on_input_ids(msg: types.Message, _, manager: DialogManager):
         await msg.answer("⚠️ Вы не указали ни одного корректного ID.")
         return
 
-    filters = await GiftFilterModel.filter(id__in=ids).values()
+    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
 
-    if not filters:
+    filters = [i.id for i in await gift_filter_repository.get_all()]
+
+    ids = [i for i in ids if i in filters]
+
+    if len(ids) == 0:
         await msg.answer("⚠️ Фильтры с указанными ID не найдены.")
         return
 
@@ -34,8 +38,9 @@ async def on_input_ids(msg: types.Message, _, manager: DialogManager):
 
 async def on_confirm_delete(call: types.CallbackQuery, _: Button, manager: DialogManager):
     ids = manager.dialog_data.get("ids", [])
-    deleted = await GiftFilterModel.filter(id__in=ids).delete()
-    await call.message.answer(f"🗑️ Удалено фильтров: <b>{deleted}</b>", parse_mode="HTML")
+    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
+    await gift_filter_repository.delete(filter_ids=ids)
+    await call.message.answer(f"🗑️ Удалено фильтров: <b>{len(ids)}</b>", parse_mode="HTML")
     await manager.done()
 
 

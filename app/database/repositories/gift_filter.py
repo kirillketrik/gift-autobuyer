@@ -13,7 +13,7 @@ class TortoiseGiftFilterRepository(GiftFilterReader, GiftFilterWriter):
         ]
 
     async def save(self, gift_filter: GiftFilter) -> GiftFilter:
-        model = await GiftFilterModel.create(**gift_filter.model_dump())
+        model = await GiftFilterModel.create(**gift_filter.model_dump(exclude=['id']))
         return GiftFilter.model_validate(model)
 
     async def delete(self, filter_ids: List[int]) -> None:

@@ -8,18 +8,19 @@ from app.bot.states import (
     SetReceiversSG,
     DeleteFilterSG, MainMenuSG,
 )
-from app.database.models import GiftFilterModel, GiftReceiverModel
-from app.models import GiftFilter
+from app.core.interfaces.repository import GiftFilterRepository, ReceiverRepository
 from app.utils.formatters import format_filter, paginate_text_blocks
 
 
 async def on_show_filters(call: types.CallbackQuery, _, manager: DialogManager):
-    filters = await GiftFilterModel.all().order_by("id").values()
+    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
+    filters = await gift_filter_repository.get_all()
+
     if not filters:
         await call.message.answer("⚠️ У вас пока нет ни одного фильтра.")
         return
 
-    texts = [format_filter(GiftFilter.model_validate(f)) for f in filters]
+    texts = [format_filter(f) for f in filters]
     blocks = paginate_text_blocks(texts)
     if len(blocks) == 1:
         text = f"🧾 <b>Ваши фильтры:</b>\n\n" + blocks[0]
@@ -32,15 +33,16 @@ async def on_show_filters(call: types.CallbackQuery, _, manager: DialogManager):
 
 
 async def on_show_receivers(call: types.CallbackQuery, _, manager: DialogManager):
-    receivers = await GiftReceiverModel.all().order_by("id").values("username")
+    receiver_repository: ReceiverRepository = manager.middleware_data['receiver_repository']
+
+    receivers = await receiver_repository.get_all()
     if not receivers:
         await call.message.answer("📭 Список получателей пуст.")
         return
 
     lines = ["🎁 <b>Получатели подарков:</b>"]
-    for r in receivers:
-        if r["username"]:
-            lines.append(f"• @{r['username']}")
+    for receiver in receivers:
+        lines.append(f"• @{receiver.username}")
     await call.message.answer("\n".join(lines), parse_mode="HTML")
     await manager.show(show_mode=ShowMode.SEND)
 

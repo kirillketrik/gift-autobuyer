@@ -13,7 +13,7 @@ class TortoiseReceiverRepository(ReceiverReader, ReceiverWriter):
         ]
 
     async def save(self, receiver: Receiver) -> None:
-        model = await ReceiverModel.create(**receiver.model_dump())
+        model = await ReceiverModel.create(**receiver.model_dump(exclude=['id']))
         return Receiver.model_validate(model)
 
     async def delete(self, receiver_ids: List[int]) -> None:

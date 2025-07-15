@@ -6,19 +6,16 @@ from aiogram_dialog.widgets.kbd import Button, Row, Cancel, Back
 from aiogram_dialog.widgets.text import Const, Format
 
 from app.bot.states import EditGiftFilterSG
+from app.core.interfaces.repository import GiftFilterRepository
 from app.utils.filters import parse_text_to_filters, parse_name_value_line
 from app.utils.formatters import format_filter, paginate_text_blocks
-
-from tortoise.transactions import in_transaction
-from app.database.models import GiftFilterModel  # Импорт модели
 
 
 async def on_save_filters(_, __, manager: DialogManager):
     filters = manager.dialog_data.get("filters", [])
-    async with in_transaction():
-        for data in filters:
-            await GiftFilterModel.create(**data.model_dump(exclude=('id',)))
-
+    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
+    for data in filters:
+        await gift_filter_repository.save(data)
     await manager.done()
 
 
@@ -34,7 +31,6 @@ async def get_paginated_filters(dialog_manager: DialogManager, **kwargs):
         pages = paginate_text_blocks(formatted_blocks)
         dialog_manager.dialog_data["filter_pages"] = pages
 
-    # Обновим индекс страницы
     page_index = max(0, min(page_index, len(pages) - 1))
     dialog_manager.dialog_data["filter_page_index"] = page_index
     page_info = f"<b>Страница {page_index + 1} из {len(pages)}</b>" if len(pages) > 1 else ""
@@ -62,7 +58,6 @@ async def on_select_mode(callback: types.CallbackQuery, _, manager: DialogManage
         await manager.switch_to(EditGiftFilterSG.input_manually)
 
 
-# Парсинг через ИИ
 async def on_ai_input(message: types.Message, _, manager: DialogManager):
     await message.answer(
         text='<b>⏳ Ожидайте, пока ИИ формирует фильтры на основе вашего запроса. Это займёт менее 30 секунд.</b>'
