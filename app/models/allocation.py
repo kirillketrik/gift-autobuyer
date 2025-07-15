@@ -7,7 +7,7 @@ from .gift_filter import GiftFilter
 class GiftAllocation(BaseModel):
     filter: GiftFilter
     gift: Gift
-    buy_amount: int = Field(..., description='Кол-во подарков, которое надо будет купить')
+    buy_amount: int
 
 
 class GiftAllocationRule(BaseModel):
