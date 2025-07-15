@@ -35,10 +35,14 @@ class TelethonGiftProvider(GiftProvider):
                     telethon.errors.UserDeactivatedBanError,
             ):
                 raise NotAuthorizedError()
-            except telethon.errors.UsernameNotOccupiedError:
-                raise InvalidUsernameError()
             except telethon.errors.FloodWaitError as error:
                 raise FloodError(pause=error.seconds)
+            except (
+                    telethon.errors.UsernameNotOccupiedError,
+                    telethon.errors.BadRequestError
+            ):
+                raise InvalidUsernameError()
+
             self._peers[username] = peer
         return peer
 

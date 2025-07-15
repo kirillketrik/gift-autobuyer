@@ -1,4 +1,3 @@
-import loguru
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
@@ -12,6 +11,4 @@ async def set_commands(bot: Bot):
 
 
 async def on_startup(bot: Bot):
-    bot_info = await bot.me()
     await set_commands(bot)
-    loguru.logger.success(f'Bot successfully started @{bot_info.username}')

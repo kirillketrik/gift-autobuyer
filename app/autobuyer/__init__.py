@@ -14,14 +14,14 @@ from app.core.interfaces.repository import GiftFilterReader, ReceiverReader
 
 class Autobuyer:
     def __init__(
-            self,
-            gift_filter_reader: GiftFilterReader,
-            receiver_reader: ReceiverReader,
-            balance_provider: BalanceProvider,
-            gift_provider: GiftProvider,
-            gift_allocator: GiftAllocator,
-            notifier: Notifier,
-            pause_after_buy: int,
+        self,
+        gift_filter_reader: GiftFilterReader,
+        receiver_reader: ReceiverReader,
+        balance_provider: BalanceProvider,
+        gift_provider: GiftProvider,
+        gift_allocator: GiftAllocator,
+        notifier: Notifier,
+        pause_after_buy: int,
     ):
         self.gift_filter_reader = gift_filter_reader
         self.receiver_reader = receiver_reader

@@ -6,8 +6,10 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field, ConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 ENV_FILE = BASE_DIR / ".env"
+STORAGE_DIR = BASE_DIR / "storage"
+DATABASE_PATH = STORAGE_DIR / "database.db"
+SESSION_PATH = STORAGE_DIR / "session"
 
 
 class TelegramConfig(BaseModel):
@@ -15,6 +17,7 @@ class TelegramConfig(BaseModel):
     api_hash: str
     bot_token: str
     admin_id: int = 0
+    session: str = str(SESSION_PATH)
 
 
 class PauseConfig(BaseModel):
@@ -25,7 +28,7 @@ class PauseConfig(BaseModel):
 class AppConfig(BaseModel):
     telegram: TelegramConfig
     pause: PauseConfig
-    db_url: str = "sqlite://storage.sqlite"
+    db_url: str = f"sqlite://{DATABASE_PATH}"
 
 
 def load_config() -> AppConfig:

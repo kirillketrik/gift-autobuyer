@@ -21,6 +21,7 @@ async def main():
     client = await auth(
         api_id=config.telegram.api_id,
         api_hash=config.telegram.api_hash,
+        session=config.telegram.session
     )
     user = await client.get_me(input_peer=False)
     config.telegram.admin_id = user.id
