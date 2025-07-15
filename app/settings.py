@@ -1,4 +1,5 @@
 import os
+from os import mkdir
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -32,6 +33,10 @@ class AppConfig(BaseModel):
 
 
 def load_config() -> AppConfig:
+    try:
+        mkdir(STORAGE_DIR)
+    except Exception:
+        pass
     load_dotenv()
     telegram = TelegramConfig(
         api_id=int(os.environ.get("API_ID")),
