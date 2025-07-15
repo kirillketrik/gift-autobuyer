@@ -6,17 +6,31 @@ from .gift import Gift
 
 
 class GiftFilter(BaseModel):
-    id: Annotated[Optional[int], Field(default=None, description="ID фильтра")]
-    enabled: Annotated[bool, Field(default=True, description="Включен ли фильтр")]
-    min_supply: Annotated[int, Field(default=-1, description="Минимальный саплай подарков. -1 = выключено")]
-    max_supply: Annotated[int, Field(default=-1, description="Максимальный саплай подарка. -1 = выключено")]
-    min_price: Annotated[int, Field(default=-1, description="Минимальная цена подарка. -1 = выключено")]
-    max_price: Annotated[int, Field(default=-1, description="Максимальная цена подарка. -1 = выключено")]
-    priority: Annotated[int, Field(default=0, description="Приоритет покупки подарков")]
-    weight: Annotated[int, Field(default=-1, description="Часть бюджета для подарков. -1 = выключено")]
-    max_buy_count: Annotated[int, Field(default=-1, description="Максимальное кол-во покупок. -1 = без лимита")]
-    max_spend_money: Annotated[int, Field(default=-1, description="Максимально можно потратить. -1 = без лимита")]
-    ordering: Annotated[str, Field(default='-price', description="Сортировка отфильтрованных результатов. Сортировка может быть по полям price и supply в убывающем или возрастающем порядке.")]
+    id: Optional[int] = None
+    """ID фильтра"""
+    enabled: bool = True
+    """Включен ли фильтр"""
+    min_supply: int = -1
+    """Минимальный саплай подарка"""
+    max_supply: int = -1
+    """Максимальный саплай подарка"""
+    min_price: int = -1
+    """Минимальная цена подарка"""
+    max_price: int = -1
+    """Максимальная цена подарка"""
+    priority: int = -1
+    """Приоритет фильтра над остальными"""
+    weight: int = -1
+    """Доля бюджета выделенная на подарки, попадающие под данный фильтр"""
+    max_buy_count: int = -1
+    """Максимальное кол-во покупки для каждого отфильтрованного подарка"""
+    max_spend_money: int = -1
+    """Максимальное кол-во звёзд, которое будет потрачено на каждый отфильтрованный подарок"""
+    ordering: str = "-price"
+    """
+    Сортирует отфильтрованные подарки по указанному полю и указанном порядке.
+    Доступные поля для фильтрации: price, supply.
+    """
 
     class Config:
         from_attributes = True
