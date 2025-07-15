@@ -4,13 +4,6 @@ set -e
 
 CONTAINER_NAME="telegram-gift-autobuyer"
 
-echo "[*] Checking if container \"$CONTAINER_NAME\" running..."
-if docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "[*] Container already running. Connecting..."
-    docker attach "$CONTAINER_NAME"
-    exit 0
-fi
-
 echo "[*] Checking for Docker..."
 if ! command -v docker &> /dev/null; then
     echo "[!] Docker not found. Installing Docker..."
@@ -38,6 +31,13 @@ fi
 echo "[*] Ensuring Docker service is running..."
 if ! sudo systemctl is-active --quiet docker; then
     sudo systemctl start docker
+fi
+
+echo "[*] Checking if container \"$CONTAINER_NAME\" running..."
+if docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    echo "[*] Container already running. Connecting..."
+    docker attach "$CONTAINER_NAME"
+    exit 0
 fi
 
 # Определяем, какую команду использовать для Docker Compose
