@@ -5,7 +5,7 @@ set -e
 SERVICE_NAME="telegram-gift-autobuyer"
 SERVICE_PATH="/etc/systemd/system/${SERVICE_NAME}.service"
 START_SCRIPT="/usr/local/bin/start_autobuyer.sh"
-PROJECT_DIR="$(pwd)"   # Текущая директория запуска скрипта
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUN_SCRIPT="run.bash"  # Имя твоего скрипта запуска
 
 USER_NAME=$(whoami)
