@@ -1,6 +1,6 @@
 import sys
 
-from telethon import TelegramClient, errors, utils
+from telethon import TelegramClient, errors
 
 
 async def auth(
