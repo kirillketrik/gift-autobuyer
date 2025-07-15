@@ -1,13 +1,23 @@
-class AutobuyerError(Exception):
-    def __init__(self, message: str):
-        self.message: str = message
+class BaseAutobuyerError(Exception):
+    pass
 
 
-class OldGiftsReceivedError(AutobuyerError):
-    def __init__(self):
-        super().__init__('There are no new gifts since last update')
+class NotAuthorizedError(BaseAutobuyerError):
+    pass
 
 
-class GiftSoldOutError(AutobuyerError):
-    def __init__(self):
-        super().__init__('The gift was sold out')
+class FloodError(BaseAutobuyerError):
+    def __init__(self, pause: float):
+        self.pause = pause
+
+
+class BaseGiftProviderError(BaseAutobuyerError):
+    pass
+
+
+class InsufficientBalanceError(BaseAutobuyerError):
+    pass
+
+
+class GiftSoldOutError(BaseGiftProviderError):
+    pass
