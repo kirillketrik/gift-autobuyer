@@ -15,7 +15,6 @@ echo "[*] Checking for Docker..."
 if ! command -v docker &> /dev/null; then
     echo "[!] Docker not found. Installing Docker..."
 
-    # Установка Docker (Ubuntu/Debian)
     sudo apt-get update
     sudo apt-get install -y \
         ca-certificates \
