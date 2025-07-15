@@ -5,6 +5,8 @@ from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Jinja
+from dishka import FromDishka
+from dishka.integrations.aiogram_dialog import inject
 
 from app.bot.states import SetReceiversSG
 from app.core.interfaces.repository import ReceiverRepository
@@ -37,10 +39,15 @@ async def on_input_usernames(msg: types.Message, _, manager: DialogManager):
     await manager.switch_to(SetReceiversSG.confirm)
 
 
-async def on_confirm_set(c: types.CallbackQuery, _, manager: DialogManager):
+@inject
+async def on_confirm_set(
+        call: types.CallbackQuery,
+        _,
+        manager: DialogManager,
+        receiver_repository: FromDishka[ReceiverRepository]
+):
     valid_usernames = manager.dialog_data.get("valid_usernames", [])
 
-    receiver_repository: ReceiverRepository = manager.dialog_data.get("receiver_repository")
     receivers = await receiver_repository.get_all()
     await receiver_repository.delete(receiver_ids=[i.id for i in receivers])
 
@@ -48,7 +55,7 @@ async def on_confirm_set(c: types.CallbackQuery, _, manager: DialogManager):
         receiver = Receiver(username=username)
         await receiver_repository.save(receiver=receiver)
 
-    await c.message.answer(
+    await call.message.answer(
         f"✅ Обновлён список получателей:\n\n" +
         "\n".join(f"• @{u}" for u in valid_usernames),
         parse_mode="HTML"

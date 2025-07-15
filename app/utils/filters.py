@@ -1,9 +1,10 @@
 import json
+import re
 from typing import Optional, List, Dict
 
 from pydantic import ValidationError
 
-from app.models.gift_filter import GiftFilter
+from app.core.models.gift_filter import GiftFilter
 from .ai import ask_ai
 
 _SYSTEM_PROMT = """
@@ -19,7 +20,7 @@ _SYSTEM_PROMT = """
   "min_price": -1,                // Минимальная цена подарка в звёздах (если не указано — установить -1)
   "max_price": -1,                // Максимальная цена подарка в звёздах (если не указано — установить -1)
   "priority": 0,                  // Приоритет фильтра (чем выше, тем раньше он применяется). Диапазон 0–100
-  "weight": -1,                   // Вес (в процентах) — доля от бюджета, выделяемая на подарки по этому фильтру (если не указано — -1)
+  "weight": 0,                   // Вес (в процентах) — доля от бюджета, выделяемая на подарки по этому фильтру (если не указано — 0)
   "max_buy_count": -1,           // Максимальное количество покупок по данному фильтру (если не указано — -1)
   "max_spend_money": -1,         // Максимальная сумма в звёздах, которую можно потратить по фильтру (если не указано — -1)
   "ordering": "-price"           // Сортировка результатов: по `price` или `supply`, по возрастанию (`+price`, `+supply`) или убыванию (`-price`, `-supply`)
@@ -82,13 +83,12 @@ async def parse_text_to_filters(query: str) -> Optional[List[GiftFilter]]:
 
 def parse_name_value_line(text: str) -> List[GiftFilter]:
     default_filter = {
-        "enabled": True,
         "min_price": -1,
         "max_price": -1,
         "min_supply": -1,
         "max_supply": -1,
         "priority": 0,
-        "weight": -1,
+        "weight": 0,
         "max_buy_count": -1,
         "max_spend_money": -1,
         "ordering": "-price"
@@ -102,26 +102,15 @@ def parse_name_value_line(text: str) -> List[GiftFilter]:
         lines = raw.strip().replace("\n", " ").split()
 
         for item in lines:
-            if "=" not in item:
-                continue
-            key, value = item.split("=", 1)
-            key = key.strip()
-            if key not in filter_data:
-                continue
-            val = value.strip()
-            if val.lower() in ("true", "false"):
-                filter_data[key] = val.lower() == "true"
-            elif val.isdigit():
-                filter_data[key] = int(val)
+            if "=" not in item: continue
+            key, value = (i.strip() for i in item.split("=", 1))
+
+            if value.isdigit():
+                filter_data[key] = int(value)
+            elif re.match('^[-+](price|supply)$', value):
+                filter_data[key] = value
         try:
-
             filter_obj = GiftFilter(**filter_data)
-
-            if len(filter_obj.ordering) < 2 or filter_obj.ordering[0] not in ("+", "-") or filter_obj.ordering[
-                                                                                           1:] not in (
-                    "price", "supply"):
-                continue
-
             filters.append(filter_obj)
         except ValidationError:
             continue

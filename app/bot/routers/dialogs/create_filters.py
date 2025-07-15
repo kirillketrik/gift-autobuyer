@@ -4,6 +4,8 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, Row, Cancel, Back
 from aiogram_dialog.widgets.text import Const, Format
+from dishka import FromDishka
+from dishka.integrations.aiogram_dialog import inject
 
 from app.bot.states import EditGiftFilterSG
 from app.core.interfaces.repository import GiftFilterRepository
@@ -11,11 +13,18 @@ from app.utils.filters import parse_text_to_filters, parse_name_value_line
 from app.utils.formatters import format_filter, paginate_text_blocks
 
 
-async def on_save_filters(_, __, manager: DialogManager):
+@inject
+async def on_save_filters(
+        _,
+        __,
+        manager: DialogManager,
+        gift_filter_repository: FromDishka[GiftFilterRepository]
+):
     filters = manager.dialog_data.get("filters", [])
-    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
+
     for data in filters:
         await gift_filter_repository.save(data)
+
     await manager.done()
 
 

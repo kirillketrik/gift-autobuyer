@@ -2,6 +2,8 @@ from aiogram import types
 from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.kbd import Button, Group, Start, Row
 from aiogram_dialog.widgets.text import Const
+from dishka import FromDishka
+from dishka.integrations.aiogram_dialog import inject
 
 from app.bot.states import (
     EditGiftFilterSG,
@@ -12,8 +14,13 @@ from app.core.interfaces.repository import GiftFilterRepository, ReceiverReposit
 from app.utils.formatters import format_filter, paginate_text_blocks
 
 
-async def on_show_filters(call: types.CallbackQuery, _, manager: DialogManager):
-    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
+@inject
+async def on_show_filters(
+        call: types.CallbackQuery,
+        _,
+        manager: DialogManager,
+        gift_filter_repository: FromDishka[GiftFilterRepository]
+):
     filters = await gift_filter_repository.get_all()
 
     if not filters:
@@ -32,9 +39,13 @@ async def on_show_filters(call: types.CallbackQuery, _, manager: DialogManager):
     await manager.show(show_mode=ShowMode.SEND)
 
 
-async def on_show_receivers(call: types.CallbackQuery, _, manager: DialogManager):
-    receiver_repository: ReceiverRepository = manager.middleware_data['receiver_repository']
-
+@inject
+async def on_show_receivers(
+        call: types.CallbackQuery,
+        _,
+        manager: DialogManager,
+        receiver_repository: FromDishka[ReceiverRepository]
+):
     receivers = await receiver_repository.get_all()
     if not receivers:
         await call.message.answer("📭 Список получателей пуст.")
@@ -52,7 +63,7 @@ main_menu_dialog = Dialog(
         Const("🏠 <b>Главное меню</b>\n\nВыберите, что вы хотите сделать:"),
         Group(
             Button(
-                Const("➖➖ [Фильтры] ➖➖"),
+                Const("💎 Фильтры 💎"),
                 id='none'
             ),
             Row(
@@ -63,7 +74,11 @@ main_menu_dialog = Dialog(
                 Start(Const("🗑️ Удалить"), id="delete", state=DeleteFilterSG.input_ids),
             ),
             Button(
-                Const("➖➖ [Получатели] ➖➖"),
+                Const("\t"),
+                id='none'
+            ),
+            Button(
+                Const("👤 Получатели 👤"),
                 id='none'
             ),
             Row(

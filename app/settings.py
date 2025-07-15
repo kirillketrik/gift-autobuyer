@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, ConfigDict
@@ -14,6 +14,7 @@ class TelegramConfig(BaseModel):
     api_id: int
     api_hash: str
     bot_token: str
+    admin_id: int = 0
 
 
 class PauseConfig(BaseModel):

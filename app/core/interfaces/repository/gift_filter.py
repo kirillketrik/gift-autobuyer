@@ -30,5 +30,5 @@ class GiftFilterWriter(ABC):
         """
 
 
-class GiftFilterRepository(ABC, GiftFilterReader, GiftFilterWriter):
+class GiftFilterRepository(GiftFilterReader, GiftFilterWriter, ABC):
     pass

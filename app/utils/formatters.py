@@ -1,18 +1,7 @@
-from app.models import GiftFilter
+from app.core.models import GiftFilter
 
 
 def format_filter(data: GiftFilter, index: int = 0) -> str:
-    FIELD_NAMES = {
-        "min_price": "Мин. цена",
-        "max_price": "Макс. цена",
-        "min_supply": "Мин. саплай",
-        "max_supply": "Макс. саплай",
-        "priority": "Приоритет",
-        "weight": "Вес (доля бюджета)",
-        "max_buy_count": "Макс. кол-во покупок",
-        "max_spend_money": "Макс. бюджет",
-    }
-
     filter_id = data.id or index + 1
 
     lines = [f"<b>🔸 Фильтр #{filter_id}</b>"]
@@ -40,7 +29,7 @@ def format_filter(data: GiftFilter, index: int = 0) -> str:
     fields['Сортировка'] = data.ordering
 
     for label, value in fields.items():
-        if isinstance(value, int) and value == -1:
+        if isinstance(value, int) and value < 1:
             continue
         lines.append(f"<b> - {label}:</b> <code>{value}</code>")
 

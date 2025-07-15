@@ -4,12 +4,20 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format
+from dishka import FromDishka
+from dishka.integrations.aiogram_dialog import inject
 
 from app.bot.states import DeleteFilterSG
 from app.core.interfaces.repository import GiftFilterRepository
 
 
-async def on_input_ids(msg: types.Message, _, manager: DialogManager):
+@inject
+async def on_input_ids(
+        msg: types.Message,
+        _,
+        manager: DialogManager,
+        gift_filter_repository: FromDishka[GiftFilterRepository],
+):
     text = msg.text.strip()
     try:
         ids = [int(x.strip()) for x in text.split(",") if x.strip().isdigit()]
@@ -20,8 +28,6 @@ async def on_input_ids(msg: types.Message, _, manager: DialogManager):
     if not ids:
         await msg.answer("⚠️ Вы не указали ни одного корректного ID.")
         return
-
-    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
 
     filters = [i.id for i in await gift_filter_repository.get_all()]
 
@@ -36,9 +42,14 @@ async def on_input_ids(msg: types.Message, _, manager: DialogManager):
     await manager.switch_to(DeleteFilterSG.confirm)
 
 
-async def on_confirm_delete(call: types.CallbackQuery, _: Button, manager: DialogManager):
+@inject
+async def on_confirm_delete(
+        call: types.CallbackQuery,
+        _,
+        manager: DialogManager,
+        gift_filter_repository: FromDishka[GiftFilterRepository]
+):
     ids = manager.dialog_data.get("ids", [])
-    gift_filter_repository: GiftFilterRepository = manager.middleware_data['gift_filter_repository']
     await gift_filter_repository.delete(filter_ids=ids)
     await call.message.answer(f"🗑️ Удалено фильтров: <b>{len(ids)}</b>", parse_mode="HTML")
     await manager.done()

@@ -8,3 +8,6 @@ class Receiver(BaseModel):
     """ID получателя"""
     username: str
     """Телеграмм username получателя подарков"""
+
+    class Config:
+        from_attributes = True

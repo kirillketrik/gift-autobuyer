@@ -29,5 +29,5 @@ class ReceiverWriter(ABC):
         """
 
 
-class ReceiverRepository(ABC, ReceiverReader, ReceiverWriter):
+class ReceiverRepository(ReceiverReader, ReceiverWriter, ABC):
     pass
