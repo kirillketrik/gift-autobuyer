@@ -1,2 +1,2 @@
 from .filter import GiftFilterModel
-from .receiver import GiftReceiverModel
+from .receiver import ReceiverModel

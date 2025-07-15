@@ -1,9 +1,9 @@
 from tortoise import Model, fields
 
 
-class GiftReceiverModel(Model):
+class ReceiverModel(Model):
     class Meta:
-        table = 'gift_receivers'
+        table = 'receivers'
 
     id = fields.IntField(pk=True)
     """ID пользователя/канала, которому будет отправляться купленный подарок"""
