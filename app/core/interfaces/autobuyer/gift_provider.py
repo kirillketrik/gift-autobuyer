@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from app.models import Gift
+from app.core.models import Gift
 
 
 class GiftProvider(ABC):
