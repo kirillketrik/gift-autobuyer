@@ -64,7 +64,8 @@ main_menu_dialog = Dialog(
         Group(
             Button(
                 Const("💎 Фильтры 💎"),
-                id='none'
+                id='show_filters',
+                on_click=on_show_filters
             ),
             Row(
                 Start(Const("➕ Создать"), id="create_filters", state=EditGiftFilterSG.select_mode),
@@ -79,7 +80,8 @@ main_menu_dialog = Dialog(
             ),
             Button(
                 Const("👤 Получатели 👤"),
-                id='none'
+                id='show_receivers',
+                on_click=on_show_receivers
             ),
             Row(
                 Start(Const("📝 Редактировать"), id="set_receivers", state=SetReceiversSG.input_usernames),

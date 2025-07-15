@@ -57,5 +57,4 @@ sudo systemctl start "$SERVICE_NAME"
 echo "[*] Статус сервиса:"
 sudo systemctl status "$SERVICE_NAME" --no-pager
 
-echo "[*] Готово! Логи можно смотреть командой:"
-echo "    journalctl -u $SERVICE_NAME -f"
+echo "[*] Готово, установка успешно завершена!"
