@@ -22,6 +22,7 @@ class GiftProvider(ABC):
 
         :return: Список объектов Gift, описывающих подарки.
         :raises NotAuthorizedError: Если клиент не авторизован.
+        :raises NoGiftChangesError: Если список подарков не поменялся с прошлого обновления
         :raises FloodError: При слишком частых запросах.
         """
 

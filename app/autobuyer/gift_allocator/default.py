@@ -1,25 +1,21 @@
-from abc import ABC, abstractmethod
 from typing import List
 
-from app.models import Gift, GiftAllocation
-from app.models import GiftFilter
-
-
-class GiftAllocator(ABC):
-    @abstractmethod
-    def get_allocations(self, balance: int, gifts: List[Gift]) -> List[GiftAllocation]:
-        ...
+from app.core.interfaces.autobuyer import GiftAllocator
+from app.core.models import Gift, GiftAllocation, GiftFilter
 
 
 class DefaultGiftAllocator(GiftAllocator):
-    def __init__(self, gift_filters: List[GiftFilter]):
-        self.gift_filters: List[GiftFilter] = [g for g in gift_filters if g.enabled]
-        self.total_weight = sum(f.weight for f in self.gift_filters)
-
-    def get_allocations(self, balance: int, gifts: List[Gift]) -> List[GiftAllocation]:
+    async def get_allocations(
+            self,
+            balance: int,
+            gift_filters: List[GiftFilter],
+            gifts: List[Gift]
+    ) -> List[GiftAllocation]:
         allocations = []
 
-        for gift_filter in self.gift_filters:
+        total_weight = sum(f.weight for f in gift_filters)
+
+        for gift_filter in gift_filters:
             order, field = gift_filter.ordering[0], gift_filter.ordering[1:]
 
             valid_gifts = sorted(
@@ -32,7 +28,7 @@ class DefaultGiftAllocator(GiftAllocator):
                 continue
 
             if gift_filter.weight > 0:
-                budget = balance * gift_filter.weight / self.total_weight
+                budget = balance * gift_filter.weight / total_weight
             else:
                 budget = balance
 

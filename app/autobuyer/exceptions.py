@@ -15,9 +15,17 @@ class BaseGiftProviderError(BaseAutobuyerError):
     pass
 
 
-class InsufficientBalanceError(BaseAutobuyerError):
+class NoGiftChangesError(BaseGiftProviderError):
+    pass
+
+
+class InsufficientBalanceError(BaseGiftProviderError):
     pass
 
 
 class GiftSoldOutError(BaseGiftProviderError):
+    pass
+
+
+class InvalidUsernameError(BaseGiftProviderError):
     pass

@@ -17,15 +17,16 @@ class GiftAllocator(ABC):
     """
 
     @abstractmethod
-    def get_allocations(self, balance: int, filters: List[GiftFilter], gifts: List[Gift]) -> List[GiftAllocation]:
+    async def get_allocations(self, balance: int, gift_filters: List[GiftFilter], gifts: List[Gift]) -> List[GiftAllocation]:
         """
         Распределить бюджет и определить, какие подарки покупать на основе:
+
         - фильтров пользователя;
         - текущего баланса;
         - актуального списка подарков.
 
         Алгоритм должен учитывать параметры каждого фильтра:
-        - включён ли фильтр (`enabled`);
+
         - диапазон цены (`min_price`, `max_price`);
         - диапазон саплая (`min_supply`, `max_supply`);
         - приоритет (`priority`);
@@ -34,7 +35,7 @@ class GiftAllocator(ABC):
         - доля бюджета (`weight`).
 
         :param balance: Количество звёзд (stars) на балансе пользователя.
-        :param filters: Список активных фильтров, по которым отбираются подарки.
+        :param gift_filters: Список активных фильтров, по которым отбираются подарки.
         :param gifts: Список всех доступных подарков из Telegram.
         :return: Список аллокаций (GiftAllocation) — решений о покупке подарков.
         """

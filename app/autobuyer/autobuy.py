@@ -8,10 +8,10 @@ from apscheduler.triggers.interval import IntervalTrigger
 from telethon import TelegramClient, errors
 from telethon.errors import AuthKeyUnregisteredError
 
-from app.autobuyer.balance_provider import BalanceProvider, DefaultBalanceProvider
+from app.autobuyer.balance_provider import BalanceProvider, TelethonBalanceProvider
 from app.autobuyer.exceptions import AutobuyerError
 from app.autobuyer.gift_allocator import GiftAllocator, DefaultGiftAllocator
-from app.autobuyer.gift_provider import GiftProvider, DefaultGiftProvider
+from app.autobuyer.gift_provider import GiftProvider, TelethonGiftProvider
 from app.autobuyer.notifier import Notifier, TelegramNotifier
 from app.database.models import GiftFilterModel, GiftReceiverModel
 from app.models import GiftFilter
@@ -82,8 +82,8 @@ async def start_autobuy(
         scheduler: BaseScheduler,
 ) -> None:
     owner_id = (await client.get_me(input_peer=True)).user_id
-    bprovider: BalanceProvider = DefaultBalanceProvider(client=client)
-    gprovider: GiftProvider = DefaultGiftProvider(client=client)
+    bprovider: BalanceProvider = TelethonBalanceProvider(client=client)
+    gprovider: GiftProvider = TelethonGiftProvider(client=client)
     notifier: Notifier = TelegramNotifier(token=config.telegram.bot_token, user_ids=[owner_id])
     scheduler.add_job(
         func=autobuy,

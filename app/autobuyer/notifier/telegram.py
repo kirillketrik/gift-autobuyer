@@ -1,15 +1,9 @@
-from abc import ABC, abstractmethod
 from typing import List
 
-import loguru
 from aiogram import Bot
 from aiogram.enums import ParseMode
 
-
-class Notifier(ABC):
-    @abstractmethod
-    async def notify(self, message: str) -> None:
-        ...
+from app.core.interfaces.autobuyer import Notifier
 
 
 class TelegramNotifier(Notifier):
@@ -25,6 +19,5 @@ class TelegramNotifier(Notifier):
                     parse_mode=ParseMode.HTML,
                     text=message
                 )
-                loguru.logger.success(f'User(user_id={user_id}) were notified in Telegram.')
             except Exception as e:
-                loguru.logger.error(e)
+                pass
