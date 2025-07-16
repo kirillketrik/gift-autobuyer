@@ -20,7 +20,7 @@ async def start_bot(
     bot = Bot(
         token=bot_token,
         default=DefaultBotProperties(
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode.HTML,
         )
     )
     dp = Dispatcher(storage=MemoryStorage())

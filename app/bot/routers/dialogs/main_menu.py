@@ -35,13 +35,13 @@ main_menu_dialog = Dialog(
     Window(
         Const(
             "🏠 <b>Главное меню</b>\n\n"
-            "⚠️ <i>Перед использованием обязательно прочитайте <b>главу 2</b> в README.md</i>"
+            "⚠️ <i>Перед использованием обязательно прочитайте <b>главу 2</b> в <a href='https://gist.github.com/kirillketrik/03c0e5419df7e3958f42a5fb752fd6a2'><b>гайде (кликабельно)</b></a></i>"
         ),
         Group(
             Start(Const("💎 Фильтры"), id="filters", state=GiftFilterSG.menu),
             Start(Const("👤 Получатели"), id="receivers", state=ReceiverSG.menu),
         ),
         state=MainMenuSG.menu,
-        parse_mode="HTML"
+        disable_web_page_preview=True
     )
 )
