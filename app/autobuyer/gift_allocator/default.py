@@ -22,7 +22,7 @@ class DefaultGiftAllocator(GiftAllocator):
             valid_gifts = sorted(
                 [g for g in gifts if gift_filter.match(g)],
                 key=lambda g: getattr(g, field, 0),
-                reverse=order
+                reverse=order == '-'
             )
 
             if len(valid_gifts) == 0:
