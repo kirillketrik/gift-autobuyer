@@ -42,13 +42,19 @@ class DefaultGiftAllocator(GiftAllocator):
             for gift in valid_gifts:
                 buy_count = min(budget // gift.price, gift.remains)
 
-                if buy_count == 0:
-                    continue
-
                 if gift_filter.max_buy_count > 0:
                     buy_count = min(buy_count, gift.max_buy_count)
 
-                balance -= buy_count * gift.price
+                total_price = buy_count * gift.price
+
+                if total_price > balance:
+                    buy_count = balance // gift.price
+                    total_price = buy_count * gift.price
+
+                if buy_count == 0:
+                    continue
+
+                balance -= total_price
 
                 allocations.append(GiftAllocation(
                     gift=gift,
