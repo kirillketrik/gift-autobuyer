@@ -1,10 +1,12 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class AuthSG(StatesGroup):
-    phone = State()
-    code = State()
-    password = State()
+class GiftFilterSG(StatesGroup):
+    menu = State()
+
+
+class ReceiverSG(StatesGroup):
+    menu = State()
 
 
 class MainMenuSG(StatesGroup):

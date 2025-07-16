@@ -6,37 +6,10 @@ from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
 from app.bot.states import (
-    EditGiftFilterSG,
     SetReceiversSG,
-    DeleteFilterSG, MainMenuSG,
+    MainMenuSG, GiftFilterSG, ReceiverSG,
 )
-from app.core.interfaces.repository import GiftFilterRepository, ReceiverRepository
-from app.utils.formatters import format_filter, paginate_text_blocks
-
-
-@inject
-async def on_show_filters(
-        call: types.CallbackQuery,
-        _,
-        manager: DialogManager,
-        gift_filter_repository: FromDishka[GiftFilterRepository]
-):
-    filters = await gift_filter_repository.get_all()
-
-    if not filters:
-        await call.message.answer("⚠️ У вас пока нет ни одного фильтра.")
-        return
-
-    texts = [format_filter(f) for f in filters]
-    blocks = paginate_text_blocks(texts)
-    if len(blocks) == 1:
-        text = f"🧾 <b>Ваши фильтры:</b>\n\n" + blocks[0]
-        await call.message.answer(text, parse_mode="HTML")
-    else:
-        for index, block in enumerate(blocks):
-            text = f"🧾 <b>Ваши фильтры — страница {index + 1}/{len(blocks)}</b>\n\n" + block
-            await call.message.answer(text, parse_mode="HTML")
-    await manager.show(show_mode=ShowMode.SEND)
+from app.core.interfaces.repository import ReceiverRepository
 
 
 @inject
@@ -60,33 +33,13 @@ async def on_show_receivers(
 
 main_menu_dialog = Dialog(
     Window(
-        Const("🏠 <b>Главное меню</b>\n\nВыберите, что вы хотите сделать:"),
+        Const(
+            "🏠 <b>Главное меню</b>\n\n"
+            "⚠️ <i>Перед использованием обязательно прочитайте <b>главу 2</b> в README.md</i>"
+        ),
         Group(
-            Button(
-                Const("💎 Фильтры 💎"),
-                id='show_filters',
-                on_click=on_show_filters
-            ),
-            Row(
-                Start(Const("➕ Создать"), id="create_filters", state=EditGiftFilterSG.select_mode),
-                Button(Const("👁 Показать"), id="show_filters", on_click=on_show_filters),
-            ),
-            Row(
-                Start(Const("🗑️ Удалить"), id="delete", state=DeleteFilterSG.input_ids),
-            ),
-            Button(
-                Const("\t"),
-                id='none'
-            ),
-            Button(
-                Const("👤 Получатели 👤"),
-                id='show_receivers',
-                on_click=on_show_receivers
-            ),
-            Row(
-                Start(Const("📝 Редактировать"), id="set_receivers", state=SetReceiversSG.input_usernames),
-                Button(Const("👁 Показать"), id="show_receivers", on_click=on_show_receivers),
-            ),
+            Start(Const("💎 Фильтры"), id="filters", state=GiftFilterSG.menu),
+            Start(Const("👤 Получатели"), id="receivers", state=ReceiverSG.menu),
         ),
         state=MainMenuSG.menu,
         parse_mode="HTML"

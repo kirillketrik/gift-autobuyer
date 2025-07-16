@@ -1,8 +1,12 @@
 from aiogram import Router
 
-from . import commands
+from . import (
+    commands,
+    errors,
+)
 
 router = Router()
 router.include_routers(
+    errors.router,
     commands.router,
 )

@@ -12,6 +12,9 @@ STORAGE_DIR = BASE_DIR / "storage"
 DATABASE_PATH = STORAGE_DIR / "database.db"
 SESSION_PATH = STORAGE_DIR / "session"
 
+FILTER_TEXT_PER_PAGE = 500
+RECEIVER_TEXT_PER_PAGE = 500
+
 
 class TelegramConfig(BaseModel):
     api_id: int

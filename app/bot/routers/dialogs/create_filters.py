@@ -9,54 +9,9 @@ from dishka.integrations.aiogram_dialog import inject
 
 from app.bot.states import EditGiftFilterSG
 from app.core.interfaces.repository import GiftFilterRepository
+from app.settings import FILTER_TEXT_PER_PAGE
 from app.utils.filters import parse_text_to_filters, parse_name_value_line
 from app.utils.formatters import format_filter, paginate_text_blocks
-
-
-@inject
-async def on_save_filters(
-        _,
-        __,
-        manager: DialogManager,
-        gift_filter_repository: FromDishka[GiftFilterRepository]
-):
-    filters = manager.dialog_data.get("filters", [])
-
-    for data in filters:
-        await gift_filter_repository.save(data)
-
-    await manager.done()
-
-
-async def get_paginated_filters(dialog_manager: DialogManager, **_kwargs):
-    filters = dialog_manager.dialog_data.get("filters", [])
-    pages = dialog_manager.dialog_data.get("filter_pages")
-    page_index = dialog_manager.dialog_data.get("filter_page_index", 0)
-
-    if pages is None:
-        formatted_blocks = [
-            format_filter(f, index=i) for i, f in enumerate(filters)
-        ]
-        pages = paginate_text_blocks(formatted_blocks)
-        dialog_manager.dialog_data["filter_pages"] = pages
-
-    page_index = max(0, min(page_index, len(pages) - 1))
-    dialog_manager.dialog_data["filter_page_index"] = page_index
-    page_info = f"<b>Страница {page_index + 1} из {len(pages)}</b>" if len(pages) > 1 else ""
-    return {
-        "filters_text": pages[page_index],
-        "page_info": page_info,
-        "pages": len(pages),
-    }
-
-
-async def on_prev_page(_, __, manager: DialogManager):
-    manager.dialog_data["filter_page_index"] = max(0, manager.dialog_data.get("filter_page_index", 0) - 1)
-
-
-async def on_next_page(_, __, manager: DialogManager):
-    pages = manager.dialog_data.get("filter_pages", [])
-    manager.dialog_data["filter_page_index"] = min(len(pages) - 1, manager.dialog_data.get("filter_page_index", 0) + 1)
 
 
 async def on_select_mode(callback: types.CallbackQuery, _, manager: DialogManager):
@@ -82,11 +37,10 @@ async def on_ai_input(message: types.Message, _, manager: DialogManager):
         manager.dialog_data["filters"] = filters
         await manager.switch_to(EditGiftFilterSG.confirm)
     else:
-        await message.answer(
+        await message.reply(
             text=(
-                "⚠️ <b>Упс! Что-то пошло не так.</b>\n\n"
-                "Попробуйте, пожалуйста, ещё раз.\n\n"
-                "Если проблема сохраняется, напишите разработчику."
+                "⚠️ <b>Упс! Что-то пошло не так. Попробуйте, пожалуйста, ещё раз.</b>\n\n"
+                "<i>Если проблема сохраняется, напишите разработчику.</i>"
             )
         )
 
@@ -98,16 +52,67 @@ async def on_manual_input(message, _, manager: DialogManager):
         manager.dialog_data["filters"] = filters
         await manager.switch_to(EditGiftFilterSG.confirm)
     except Exception:
-        await message.answer(
-            text=(
-                "⚠️ <b>Неверный формат ввода.</b>\n\n"
-                "Пожалуйста, введите фильтры в формате <code>name=value</code>, "
-                "разделяя несколько фильтров двумя пустыми строками.\n\n"
-                "Пример:\n"
-                "<code>min_price=100 max_price=500</code>\n\n"
-                "<code>priority=10 max_spend_money=1000</code>"
-            )
+        await message.reply(
+            text="⚠️ <b>Неверный формат ввода!</b>"
         )
+
+
+@inject
+async def on_save_filters(
+        _call: types.CallbackQuery,
+        _button: Button,
+        manager: DialogManager,
+        gift_filter_repository: FromDishka[GiftFilterRepository]
+):
+    filters = manager.dialog_data.get("filters", [])
+
+    for data in filters:
+        await gift_filter_repository.save(data)
+
+    await manager.done()
+
+
+async def get_paginated_filters(dialog_manager: DialogManager, **_kwargs):
+    filters = dialog_manager.dialog_data.get("filters", [])
+    pages = dialog_manager.dialog_data.get("filter_pages")
+    if pages is None:
+        formatted_blocks = [
+            format_filter(f, index=i) for i, f in enumerate(filters)
+        ]
+        pages = paginate_text_blocks(formatted_blocks, max_len=FILTER_TEXT_PER_PAGE)
+        dialog_manager.dialog_data["filter_pages"] = pages
+
+    total = len(pages)
+    index = dialog_manager.dialog_data.get("filter_page_index", 0)
+    index = max(0, min(index, total - 1))
+    dialog_manager.dialog_data["filter_page_index"] = index
+
+    return {
+        "filters_text": pages[index],
+        "page": index + 1,
+        "total": total,
+        "pages": total,
+    }
+
+
+async def on_prev_page(
+        _call: types.CallbackQuery,
+        _button: Button,
+        manager: DialogManager
+):
+    current = manager.dialog_data.get("filter_page_index", 0)
+    total = len(manager.dialog_data.get("filter_pages", []))
+    manager.dialog_data["filter_page_index"] = (current - 1) % total
+
+
+async def on_next_page(
+        _call: types.CallbackQuery,
+        _button: Button,
+        manager: DialogManager
+):
+    current = manager.dialog_data.get("filter_page_index", 0)
+    total = len(manager.dialog_data.get("filter_pages", []))
+    manager.dialog_data["filter_page_index"] = (current + 1) % total
 
 
 # Диалог
@@ -137,10 +142,10 @@ dialog = Dialog(
     Window(
         Const(
             """
-✍️ <b>Введите параметры фильтров вручную в формате: <code>имя=значение</code></b>
-
-<b>- Пробел должен разделять параметры одного фильтра</b>
-<b>- Две пустые строки должны разделять разные фильтры</b>
+✍️ <b>Введите параметры фильтров вручную, вот основные правила:</b>
+1. Формат параметров должен быть: <code>имя=значение</code> 
+2. Пробел должен разделять параметры одного фильтра
+3. Две пустые строки должны разделять разные фильтры
 
 <i> Примеры находятся в README.md файле в <b>главе 2.2.5</b></i>
 """),
@@ -154,11 +159,26 @@ dialog = Dialog(
     ),
     Window(
         Format(
-            "<b>🔔 Сформированы следующие фильтры:</b>\n\n{filters_text}\n\n{page_info}"
+            "<b>🔔 Сформированы следующие фильтры:</b>\n\n"
+            "{filters_text}\n\n"
+            "<b>💡 Хотите сохранить данные фильтры?</b>"
         ),
         Row(
-            Button(Const("⬅️ Назад"), id="prev", on_click=on_prev_page),
-            Button(Const("➡️ Далее"), id="next", on_click=on_next_page),
+            Button(
+                Format("⬅️"),
+                id="prev",
+                on_click=on_prev_page,
+            ),
+            Button(
+                Format("{page}/{total}"),
+                id="current_page",
+                on_click=None
+            ),
+            Button(
+                Format("➡️"),
+                id="next",
+                on_click=on_next_page,
+            ),
             when=F['pages'] > 1
         ),
         Row(
@@ -168,4 +188,5 @@ dialog = Dialog(
         getter=get_paginated_filters,
         state=EditGiftFilterSG.confirm,
     )
+
 )

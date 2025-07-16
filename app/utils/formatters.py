@@ -36,18 +36,18 @@ def format_filter(data: GiftFilter, index: int = 0) -> str:
     return "\n".join(lines)
 
 
-def paginate_text_blocks(texts: list[str], max_len: int = 3500) -> list[str]:
+def paginate_text_blocks(texts: list[str], max_len: int = 3500, separator='\n\n') -> list[str]:
     pages = []
     current = ""
 
     for block in texts:
-        if len(current) + len(block) + 2 > max_len:
+        if len(current) + len(block) + len(separator) > max_len:
             pages.append(current.strip())
-            current = block + "\n\n"
+            current = block + separator
         else:
-            current += block + "\n\n"
+            current += block + separator
 
     if current.strip():
         pages.append(current.strip())
 
-    return pages
+    return [p for p in pages if not p.isspace() and len(p) > 1]

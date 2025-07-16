@@ -22,11 +22,11 @@ async def on_input_ids(
     try:
         ids = [int(x.strip()) for x in text.split(",") if x.strip().isdigit()]
     except ValueError:
-        await msg.answer("❌ Ошибка при разборе ID. Убедитесь, что вы указали только числа через запятую.")
+        await msg.answer("<b>❌ Ошибка при разборе ID. Убедитесь, что вы указали только числа через запятую.</b>")
         return
 
     if not ids:
-        await msg.answer("⚠️ Вы не указали ни одного корректного ID.")
+        await msg.answer("<b>⚠️ Вы не указали ни одного корректного ID.</b>")
         return
 
     filters = [i.id for i in await gift_filter_repository.get_all()]
@@ -34,7 +34,7 @@ async def on_input_ids(
     ids = [i for i in ids if i in filters]
 
     if len(ids) == 0:
-        await msg.answer("⚠️ Фильтры с указанными ID не найдены.")
+        await msg.answer("<b>⚠️ Фильтры с указанными ID не найдены.</b>")
         return
 
     manager.dialog_data["ids"] = ids
@@ -51,7 +51,7 @@ async def on_confirm_delete(
 ):
     ids = manager.dialog_data.get("ids", [])
     await gift_filter_repository.delete(filter_ids=ids)
-    await call.message.answer(f"🗑️ Удалено фильтров: <b>{len(ids)}</b>", parse_mode="HTML")
+    await call.answer(f"🗑️ Удалено фильтров: {len(ids)}", show_alert=True)
     await manager.done()
 
 
